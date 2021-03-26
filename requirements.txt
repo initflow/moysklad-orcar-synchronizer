@@ -1,0 +1,5 @@
+Django==1.11.29
+django-oscar==2.0.4
+django-bulk-update==2.2.0
+python-dotenv==0.14.0
+psycopg2-binary==2.8.6

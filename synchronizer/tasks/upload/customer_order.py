@@ -11,22 +11,56 @@ from synchronizer.tasks.upload.static_upload_values import StaticUploadValues
 from synchronizer.utils.loader import RequestList
 
 Line = get_model('order', 'Line')
+Product = get_model('catalogue', 'Product')
 OrderInformation = get_model('shop', 'OrderInformation')
 
 default_url = "https://online.moysklad.ru/api/remap/1.1/entity/customerorder/"
 
 
+class AbstractPosition:
+    def __init__(self, quantity: int, price: Decimal, discount: float, sync_id: str, sync_type: str):
+        self.quantity = quantity
+        self.price = price * 100
+        self.discount = discount
+        self.sync_id = sync_id
+        self.sync_type = sync_type
+
+    @property
+    def data(self) -> dict:
+        return {
+            'quantity': self.quantity,
+            'price': self.price * 100,
+            'discount': self.discount,
+            'assortment': {
+                'meta': {
+                    'href': f'https://online.moysklad.ru/api/remap/1.1/entity/{self.sync_type}/{self.sync_id}',
+                    'type': self.sync_type,
+                    'mediaType': 'application/json'
+                }
+            }
+        }
+
+
+class ProductPosition(AbstractPosition):
+    def __init__(self, quantity: int, price: Decimal, discount: float, product: Product):
+        product_sync = ProductSync.objects.filter(product_id=product.id).first()
+        if product_sync:
+            sync_type = 'product'
+        else:
+            product_sync = VariantSync.objects.filter(product_id=product.id).first()
+            sync_type = 'variant'
+        super().__init__(quantity, price, discount, product_sync.sync_id, sync_type)
+
+
+class ServicePosition(AbstractPosition):
+    def __init__(self, quantity: int, price: Decimal, discount: float, sync_id: str):
+        sync_type = 'service'
+        super().__init__(quantity, price, discount, sync_id, sync_type)
+
+
 def get_positions(lines, discounts, order):
     positions = []
     for line in lines:
-
-        product_sync = ProductSync.objects.filter(product_id=line.product.id).first()
-        sync_type = 'product'
-        href_start = 'https://online.moysklad.ru/api/remap/1.1/entity/product/'
-        if product_sync is None:
-            product_sync = VariantSync.objects.filter(product_id=line.product.id).first()
-            sync_type = 'variant'
-            href_start = 'https://online.moysklad.ru/api/remap/1.1/entity/variant/'
         price = 0
         discount = 0
         vouchers = [discount for discount in discounts if discount.voucher is not None]
@@ -37,69 +71,62 @@ def get_positions(lines, discounts, order):
             elif vouchers[0].voucher.benefit.type == 'Absolute':
                 price = line.line_price_excl_tax * 100 / line.quantity
                 discount = 0
-
         else:
             price = line.line_price_excl_tax * 100 / line.quantity
             discount = 0
-        position = {
-            'quantity': line.quantity,
-            'price': price,
-            'discount': discount,
-            'assortment': {
-                'meta': {
-                    'href': href_start + product_sync.sync_id,
-                    'type': sync_type,
-                    'mediaType': 'application/json'
-                }
-            }
-        }
+
+        position = ProductPosition(
+            quantity=line.quantity,
+            price=price,
+            discount=discount,
+            product=line.product)
         positions.append(position)
 
-    if order.shipping_method in StaticUploadValues.shipping_items.keys():
-        position = {
-            "quantity": 1,
-            "price": Decimal((order.shipping_incl_tax * 100)),
-            "discount": 0,
-            "vat": 0,
-            'assortment': {
-                "meta": StaticUploadValues.get_shipping_item(order.shipping_method)
-            }
-        }
-        positions.append(position)
-
+    # if order.shipping_incl_tax > 0:
+    #     position = ServicePosition(
+    #         quantity=1,
+    #         price=order.shipping_incl_tax,
+    #         discount=0,
+    #         sync_id='1054042d-6a24-11e7-7a69-97110006dc67')
+    #     positions.append(position)
     return positions
 
 
-def upload(order):
-    try:
-        order_information = OrderInformation.objects.get(order=order)
-    except:
-        order_information = None
-
+def get_description(order):
+    order_information = OrderInformation.objects.first(order=order)
     description = f'Aдрес доставка: {order.shipping_address};\n' \
                   f'{str(order_information)}\n' \
                   f'Номер телефона: {order.shipping_address.phone_number}\n '
-
-    random_id = rand.randrange(0, 100000)
-    user_sync = UserSync.objects.find_by_order(order)
-    if user_sync is None:
-        user_sync = counter_party.upload(email=order.email if order.email else order.user.email,
-                                         name=order.shipping_address.name,
-                                         phone=order.shipping_address.phone_number.raw_input,
-                                         user=order.user)
 
     discounts = list(order.discounts.all())
     for discount in discounts:
         description = description + '\nCкидка: \n' + str(discount.offer_name)
 
+    return description
+
+
+def upload(order):
+    user_sync = UserSync.objects.find_by_order(order)
+    if user_sync is None:
+        user_sync = counter_party.upload(
+            email=order.email if order.email else order.user.email,
+            name=order.shipping_address.name,
+            phone=order.shipping_address.phone_number.raw_input,
+            user=order.user)
+
     lines = Line.objects.filter(order=order).all()
+    description = get_description(order)
+    discounts = list(order.discounts.all())
+    random_id = rand.randrange(0, 100000)
+    positions = [position.data for position in get_positions(lines, discounts, order)]
+
     data = {'name': settings.MOY_SKLAD_DOC_NAME_PREF + '_' + str(order.number) + '_' + str(
         random_id) + settings.MOY_SKLAD_DOC_NAME_END,
             'agent': StaticUploadValues.get_counter_party_container(str(user_sync.sync_id)),
             'organization': StaticUploadValues.organization_meta_container,
-            'attributes': [],  # discount
+            'attributes': [],
             'description': description,
-            'positions': get_positions(lines, discounts, order)}  # order variants
+            'positions': positions}
 
     result = RequestList.upload(default_url, json_data=data)
     order_sync = OrderSync(order_sync_id=result.get('id'), order=order, counter_party_id=user_sync.sync_id)
