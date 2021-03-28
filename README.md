@@ -2,8 +2,9 @@
 
 Quick start
 -----------
+1. Install  ``git+https://github.com/initflow/moysklad-orcar-synchronizer`` 
 
-1. Add ``synchronizer`` to your INSTALLED_APPS in settings.py::
+2. Add ``synchronizer`` to your INSTALLED_APPS in settings.py
 
 ```
  INSTALLED_APPS = (
@@ -13,7 +14,9 @@ Quick start
     )
 ```
 
-2. Configure django settings
+3. Get api token. Encode base64 ``login:password``
+
+4. Configure django settings
 
 ```
     MOYSKLAD_TOKEN = ""
@@ -24,6 +27,7 @@ Quick start
     MOYSKLAD_USER_LOADED_GROUP = 'https://online.moysklad.ru/api/remap/1.1/entity/group/123-456-789'
 
 ```
-    
-3. Run ``python manage.py makemigrations synchronizer && python manage.py migrate synchronizer`` to create models.
+
+5. Run migrations ``python manage.py migrate synchronizer``
+6. Synchronize ``python manage.py sync_database``
 
