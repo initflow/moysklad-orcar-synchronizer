@@ -27,10 +27,10 @@ def upload(order):
         data = {
             'syncId': sync_id,
             'name': '{}_{}_{}_{}'.format(
-                settings.MOY_SKLAD_DOC_NAME_PREF,
+                settings.MOYSKLAD_DOC_NAME_PREF,
                 str(order.id),
                 str(random_id),
-                settings.MOY_SKLAD_DOC_NAME_END),
+                settings.MOYSKLAD_DOC_NAME_END),
             'agent': StaticUploadValues.get_counter_party_container(str(order_sync.counter_party_id)),
             'organization': StaticUploadValues.organization_meta_container,
             'sum': order.total_incl_tax * 100,

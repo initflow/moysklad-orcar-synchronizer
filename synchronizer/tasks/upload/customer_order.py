@@ -120,8 +120,8 @@ def upload(order):
     random_id = rand.randrange(0, 100000)
     positions = [position.data for position in get_positions(lines, discounts, order)]
 
-    data = {'name': settings.MOY_SKLAD_DOC_NAME_PREF + '_' + str(order.number) + '_' + str(
-        random_id) + settings.MOY_SKLAD_DOC_NAME_END,
+    data = {'name': settings.MOYSKLAD_DOC_NAME_PREF + '_' + str(order.number) + '_' + str(
+        random_id) + settings.MOYSKLAD_DOC_NAME_END,
             'agent': StaticUploadValues.get_counter_party_container(str(user_sync.sync_id)),
             'organization': StaticUploadValues.organization_meta_container,
             'attributes': [],

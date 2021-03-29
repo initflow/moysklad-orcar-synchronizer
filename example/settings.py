@@ -20,8 +20,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MOYSKLAD_TOKEN = os.environ.get('MOYSKLAD_TOKEN', "")
 MOYSKLAD_MEDIA_URL = os.environ.get("MOYSKLAD_MEDIA_URL", 'images/products/moysklad')
 MOYSKLAD_MEDIA_ROOT = os.path.join(MEDIA_ROOT, MOYSKLAD_MEDIA_URL)
-MOY_SKLAD_DOC_NAME_PREF = os.environ.get("MOY_SKLAD_DOC_NAME_PREF", "IM")
-MOY_SKLAD_DOC_NAME_END = os.environ.get("MOY_SKLAD_DOC_NAME_END", "_test")
+MOYSKLAD_DOC_NAME_PREF = os.environ.get("MOYSKLAD_DOC_NAME_PREF", "IM")
+MOYSKLAD_DOC_NAME_END = os.environ.get("MOYSKLAD_DOC_NAME_END", "_test")
 MOYSKLAD_USER_LOADED_GROUP = os.environ.get("MOYSKLAD_USER_LOADED_GROUP", "")
 
 
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.communications',
     'oscar.apps.dashboard.shipping',
 
+    'synchronizer',
     'app',
 ]
 
