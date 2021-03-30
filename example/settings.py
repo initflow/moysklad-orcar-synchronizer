@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.shipping',
 
     'synchronizer',
+    'oscarapi',
     'app',
 ]
 
