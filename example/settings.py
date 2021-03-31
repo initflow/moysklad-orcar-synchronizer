@@ -16,6 +16,7 @@ STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+CELERY_APP = 'celery_config.app'
 
 MOYSKLAD_TOKEN = os.environ.get('MOYSKLAD_TOKEN', "")
 MOYSKLAD_MEDIA_URL = os.environ.get("MOYSKLAD_MEDIA_URL", 'images/products/moysklad')
@@ -67,7 +68,7 @@ INSTALLED_APPS = [
 
     'synchronizer',
     'oscarapi',
-    'app',
+    'shop',
 ]
 
 MIDDLEWARE = [
