@@ -19,6 +19,7 @@ Quick start
 4. Configure django settings
 
 ```
+    OSCAR_SLUG_FUNCTION = 'synchronizer.utils.slugifier' # for oscar>=2.0.0
     CELERY_APP = 'celery_config.app'
     
     MOYSKLAD_TOKEN = os.environ.get('MOYSKLAD_TOKEN', "")

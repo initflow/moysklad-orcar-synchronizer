@@ -6,6 +6,7 @@ django-bulk-update==2.2.0
 python-dotenv==0.14.0
 psycopg2-binary==2.8.6
 requests==2.25.1
+Unidecode==1.0.23
 
 ipython==7.16.1
 jedi==0.17.2
