@@ -1,14 +1,16 @@
 from django.utils.timezone import now
 from django.dispatch import receiver
+from django.conf import settings
+from django.utils.module_loading import import_string
+from django.db.models.signals import post_save
 from oscar.core.loading import get_model
 from oscarapicheckout.signals import order_placed
-from django.db.models.signals import post_save
 
-from app.celery import app
 from synchronizer.models import SyncTaskObject, OrderSync
 from .load import accumulation_discount, product_folder, counter_party, delete, product, stock, store, variant
 from .upload import invoice_out, payment_in, customer_order
 
+app = import_string(settings.CELERY_APP)
 Order = get_model('order', 'Order')
 PaymentEvent = get_model('order', 'PaymentEvent')
 

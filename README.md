@@ -19,6 +19,8 @@ Quick start
 4. Configure django settings
 
 ```
+    CELERY_APP = 'celery_config.app'
+    
     MOYSKLAD_TOKEN = os.environ.get('MOYSKLAD_TOKEN', "")
     MOYSKLAD_MEDIA_URL = os.environ.get("MOYSKLAD_MEDIA_URL", 'images/products/moysklad')
     MOYSKLAD_MEDIA_ROOT = os.path.join(MEDIA_ROOT, MOYSKLAD_MEDIA_URL)
