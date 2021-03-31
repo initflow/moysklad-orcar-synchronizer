@@ -1,9 +1,12 @@
 from django.conf import settings
-from cms.models import User, Q
+from django.db.models import Q
+from oscar.core.compat import get_user_model
 
 from synchronizer.models import UserSync
 from synchronizer.utils.loader import RequestList
 from synchronizer.utils.util import get_map_objects_by_sync_id, update_or_insert
+
+User = get_user_model()
 
 default_url = "https://online.moysklad.ru/api/remap/1.1/entity/counterparty/"
 
