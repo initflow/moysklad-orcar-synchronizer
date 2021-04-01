@@ -68,6 +68,9 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.shipping',
 
     'synchronizer',
+    'sorl.thumbnail',
+    'django_tables2',
+    'widget_tweaks',
     'oscarapi',
     'shop',
 ]
