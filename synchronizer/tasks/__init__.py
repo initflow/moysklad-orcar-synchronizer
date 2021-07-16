@@ -17,12 +17,15 @@ PaymentEvent = get_model('order', 'PaymentEvent')
 
 @app.task(name="initial_task")
 def initial_task(force_full_update: bool = False, is_delete=False):
-    print('-----PRODUCT UPDATE--------')
-    product_update(force_full_update, is_delete)
-    print('-----DISCOUNT SYNC--------')
-    discount_update(force_full_update)
-    print('-----PRODUCT STOCK--------')
-    product_sync_stock(force_full_update)
+    if getattr(settings, 'MOYSKLAD_PRODUCT_LOAD', True):
+        print('-----PRODUCT UPDATE--------')
+        product_update(force_full_update, is_delete)
+    if getattr(settings, 'MOYSKLAD_DISCOUNT_LOAD', True):
+        print('-----DISCOUNT SYNC--------')
+        discount_update(force_full_update)
+    if getattr(settings, 'MOYSKLAD_STOCK_LOAD', True):
+        print('-----PRODUCT STOCK--------')
+        product_sync_stock(force_full_update)
 
 
 @app.task(name="product_update_task")
