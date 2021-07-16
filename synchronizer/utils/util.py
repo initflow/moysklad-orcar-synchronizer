@@ -1,5 +1,13 @@
 from datetime import datetime
 from pytz import timezone
+from django.db import transaction
+
+
+@transaction.atomic
+def bulk_save(items):
+    for item in items:
+        item.save()
+    return items
 
 
 def check_id_is_none_and_add_to_list(obj, list_with_id, list_without_id):

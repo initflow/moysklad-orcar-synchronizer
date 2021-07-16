@@ -23,7 +23,7 @@ def fasdfsd(x, model) -> None:
 
 
 def execute(last_update=None):
-    params = {"filter": 'group=' + settings.MOYSKLAD_USER_LOADED_GROUP}
+    params = {}
     if last_update:
         params['updatedFrom'] = last_update.strftime('%Y-%m-%d %H:%M:%S')
 

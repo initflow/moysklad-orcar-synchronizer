@@ -13,7 +13,8 @@ from synchronizer.models import ProductFolderSync, ProductSync
 from synchronizer.tasks.load import product_folder
 from synchronizer.utils.loader import RequestList
 from synchronizer.utils.optional import Optional
-from synchronizer.utils.util import get_map_objects_by_id_element_row, parse_date_for_moscow, update_or_insert
+from synchronizer.utils.util import get_map_objects_by_id_element_row, \
+    parse_date_for_moscow, update_or_insert, bulk_save
 
 ProductInformation = get_model('shop', 'ProductInformation')
 
@@ -191,7 +192,10 @@ def update_product_attr_from_sync_obj(product_syncs, get_attributes_func, produc
             deleted_attr_value_ids.append(deleted_attr.id)
             # deleted_attr.delete()
     update_result = bulk_update(updated_attr_values)
-    insert_result = ProductAttributeValue.objects.bulk_create(added_attr_values)
+    if getattr(settings, 'MOYSKLAD_BULK_CREATE', True):
+        insert_result = ProductAttributeValue.objects.bulk_create(added_attr_values)
+    else:
+        insert_result = bulk_save(added_attr_values)
     delete_result = ProductAttributeValue.objects.filter(id__in=deleted_attr_value_ids).delete()
 
 
