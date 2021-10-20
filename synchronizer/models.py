@@ -225,8 +225,8 @@ class OrderSync(models.Model):
     invoice_out_sync_id = models.CharField(max_length=100, null=True)
     payment_sync_id = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True)
-    counter_party_id = models.CharField(max_length=100, null=True, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, blank=True, null=True, db_index=True)
+    counter_party_id = models.CharField(max_length=100, null=True)
+    order = models.ForeignKey(Order, blank=True, null=True, db_index=True, on_delete=models.CASCADE)
 
     objects = OrderSyncUpdateManager()
 
