@@ -43,7 +43,7 @@ class ProductSync(models.Model):
     name = models.CharField(max_length=10000, null=True)
     attributes = models.CharField(max_length=10000, default='{}')
     image_url = models.CharField(max_length=10000, null=True)
-    product = models.ForeignKey(Product, blank=True, null=True)
+    product = models.ForeignKey(Product, blank=True, null=True, on_delete=models.CASCADE)
     objects = ProductSyncManager()
     product_sync = models.Manager()
 
@@ -66,9 +66,9 @@ class ProductFolderSync(models.Model):
     archived = models.BooleanField()
     updated = models.DateTimeField()
     name = models.CharField(max_length=100)
-    parent_product_folder_sync = models.ForeignKey('ProductFolderSync', blank=True, null=True)
+    parent_product_folder_sync = models.ForeignKey('ProductFolderSync', blank=True, null=True, on_delete=models.CASCADE)
     path_name_changed = models.CharField(max_length=200, null=True)
-    category = models.ForeignKey(Category, blank=True, null=True, related_name='sync')
+    category = models.ForeignKey(Category, blank=True, null=True, related_name='sync', on_delete=models.CASCADE)
 
     objects = ProductFolderSyncUpdateManager()
 
@@ -87,7 +87,7 @@ class VariantSync(models.Model):
     price = models.IntegerField
     product_sync_id = models.CharField(max_length=400, null=True)
     characteristics = models.CharField(max_length=1000, default='{}')
-    product = models.ForeignKey(Product, blank=True, null=True)
+    product = models.ForeignKey(Product, blank=True, null=True, on_delete=models.CASCADE)
 
     def set_characteristics(self, x):
         self.characteristics = json.dumps(x) if x else '{}'
@@ -109,7 +109,7 @@ class VariantCharacteristics(models.Model):
     name = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
     variant_sync_id = models.CharField(max_length=100, null=True)
-    variant_sync_obj = models.ForeignKey('VariantSync', blank=True, null=True)
+    variant_sync_obj = models.ForeignKey('VariantSync', blank=True, null=True,  on_delete=models.CASCADE)
 
     objects = VariantCharacteristicsUpdateManager()
 
@@ -128,7 +128,7 @@ class StoreSync(models.Model):
     path_name = models.CharField(max_length=100, null=True)
     address = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=100, null=True)
-    partner = models.ForeignKey(Partner, blank=True, null=True)
+    partner = models.ForeignKey(Partner, blank=True, null=True, on_delete=models.CASCADE)
 
     objects = StoreSyncUpdateManager()
 
@@ -147,7 +147,7 @@ class StockTypeEnum(Enum):
 class StockByStoreSync(models.Model):
     product_or_variant_sync_id = models.CharField(max_length=100, null=True)
     type_enum = models.CharField(max_length=50, choices=[(tag, tag.value) for tag in StockTypeEnum])
-    store = models.ForeignKey('StoreSync', blank=True, null=True)
+    store = models.ForeignKey('StoreSync', blank=True, null=True, on_delete=models.CASCADE)
     stock = models.IntegerField
     in_transit = models.IntegerField
     reserve = models.IntegerField
@@ -175,7 +175,7 @@ class UserSync(models.Model):
     archived = models.BooleanField(default=False)
     updated = models.DateTimeField(auto_now_add=True,)
     email = models.CharField(max_length=100, null=True)
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     personal_discount = models.IntegerField(default=0)
     demand_sum_correction = models.IntegerField(default=0)
 
@@ -225,7 +225,7 @@ class OrderSync(models.Model):
     invoice_out_sync_id = models.CharField(max_length=100, null=True)
     payment_sync_id = models.CharField(max_length=100, null=True)
     status = models.CharField(max_length=100, null=True)
-    counter_party_id = models.CharField(max_length=100, null=True)
+    counter_party_id = models.CharField(max_length=100, null=True, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, blank=True, null=True, db_index=True)
 
     objects = OrderSyncUpdateManager()
