@@ -67,6 +67,9 @@ def update_p(product_rows):
             .if_exists(lambda x: x / 100)
         updated_date = parse_date_for_moscow(row.get('updated'))
 
+        if not product_folder_id:
+            continue
+
         p_from_db.sync_id = sync_id
         p_from_db.folder_sync_id = product_folder_id
         p_from_db.path_name = row.get('pathName')
