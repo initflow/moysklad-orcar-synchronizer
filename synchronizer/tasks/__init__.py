@@ -41,11 +41,13 @@ def initial_task(force_full_update: bool = False, is_delete=False):
 
 
 @app.task(name="product_update_task")
+@task_timer
 def product_update_task(force_full_update: bool = False):
     product_update()
 
 
 @app.task(name="product_sync_stock_task")
+@task_timer
 def product_sync_stock_task(force_full_update: bool = False):
     product_sync_stock()
 
