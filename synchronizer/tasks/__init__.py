@@ -10,12 +10,24 @@ from synchronizer.models import SyncTaskObject, OrderSync
 from .load import accumulation_discount, product_folder, counter_party, delete, product, stock, store, variant
 from .upload import invoice_out, payment_in, customer_order
 
+if hasattr(settings, 'MOYSKLAD_TASK_NOTIFIER'):
+    import importlib
+    notifier = importlib.import_module(settings.MOYSKLAD_TASK_NOTIFIER)
+    task_timer = notifier.task_timer
+else:
+    def task_timer(func):
+        def wrap(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrap
+
+
 app = import_string(settings.CELERY_APP)
 Order = get_model('order', 'Order')
 PaymentEvent = get_model('order', 'PaymentEvent')
 
 
 @app.task(name="initial_task")
+@task_timer
 def initial_task(force_full_update: bool = False, is_delete=False):
     if getattr(settings, 'MOYSKLAD_PRODUCT_LOAD', True):
         print('-----PRODUCT UPDATE--------')
