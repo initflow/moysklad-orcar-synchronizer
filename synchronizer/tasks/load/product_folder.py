@@ -14,10 +14,7 @@ default_url = "https://online.moysklad.ru/api/remap/1.1/entity/productfolder/"
 
 def execute(last_update=None):
     folders_rows = []
-    if hasattr(settings, 'MOYSKLAD_PRODUCT_FOLDER'):
-        params = {"filter": "pathName~=" + settings.MOYSKLAD_PRODUCT_FOLDER}
-    else:
-        params = {}
+    params = {}
 
     if last_update:
         params['updatedFrom'] = last_update.strftime('%Y-%m-%d %H:%M:%S')
