@@ -41,7 +41,10 @@ partner_sku_func = lambda partner, product: 'par=' + str(partner.id) + '_prod=' 
 
 
 def execute(last_update=None):
-    params = {}
+    if hasattr(settings, 'MOYSKLAD_PRODUCT_FOLDER'):
+        params = {"filter": "pathName~=" + settings.MOYSKLAD_PRODUCT_FOLDER}
+    else:
+        params = {}
 
     if last_update:
         params['updatedFrom'] = last_update.strftime('%Y-%m-%d %H:%M:%S')

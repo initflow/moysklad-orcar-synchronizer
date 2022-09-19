@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from oscar.apps.catalogue.categories import create_from_breadcrumbs
 from oscar.apps.catalogue.models import Category
 
@@ -12,7 +14,10 @@ default_url = "https://online.moysklad.ru/api/remap/1.1/entity/productfolder/"
 
 def execute(last_update=None):
     folders_rows = []
-    params = {}
+    if hasattr(settings, 'MOYSKLAD_PRODUCT_FOLDER'):
+        params = {"filter": "pathName~=" + settings.MOYSKLAD_PRODUCT_FOLDER}
+    else:
+        params = {}
 
     if last_update:
         params['updatedFrom'] = last_update.strftime('%Y-%m-%d %H:%M:%S')
